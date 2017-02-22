@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 
-namespace WebApi.Models
+namespace WebApi.Data
 {
-    public class User
+    public class Player
     {
-        public int UserId { get; set; }
+        public int PlayerId { get; set; }
+        [BsonIndex(true)]
         public string Name { get; set; }
     }
 

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Models
 {
-    public class GameMode
+    class GameModeModel
     {
-        public int GameModeId { get; set; }
-        public string Name { get; set; }
     }
 }
