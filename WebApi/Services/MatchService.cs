@@ -9,11 +9,33 @@ using LiteDB;
 using WebApi.Controllers;
 using WebApi.Data;
 using WebApi.Models;
+using WebApi.Repository;
 
 namespace WebApi.Services
 {
     class MatchService
     {
+        private ScoreRepository _scoresRepository;
+        private PlayerService _playerService;
+        private MapService _mapService;
+        private MatchPlayerContractService _MPContractService;
+        private ScoreService _scoreService { get; set; }
+        private MatchRepository _matchRepository { get; set; }
+        private PlayerService _playerModeService { get; set; }
+        private ServerService _serverService { get; set; }
+        public MatchService()
+        {
+            _scoreService = new ScoreService();
+            _matchRepository = new MatchRepository();
+            _playerModeService = new PlayerService();
+            _serverService = new ServerService();
+            _scoresRepository = new ScoreRepository();
+            _playerService = new PlayerService();
+            _mapService = new MapService();
+            _MPContractService = new MatchPlayerContractService();
+        }
+
+        
         public void FillDataBase(int count)
         {
             var server = new Server()
@@ -50,6 +72,51 @@ namespace WebApi.Services
                
             }
             stope.Stop();
+        }
+
+        public bool TryInsert(MatchModel model)
+        {
+            var gameMode = model.Server.GameModes.FirstOrDefault(mode => mode.Name == model.GameMode);
+            var map = _mapService.GetOrInsertByName(model.Map);
+            if ( gameMode == null)
+                return false;
+            var match = new Match
+            {
+                ServerId = model.Server.ServerId,
+                Server = model.Server,
+                FragLimit = model.FragLimit,
+                GameMode = gameMode,
+                Date = model.Date,
+                Map = map,
+                TimeElapsed = model.TimeElapsed,
+                TimeLimit = model.TimeLimit
+            };
+
+            _matchRepository.Insert(match);
+
+            var players = _playerService.UpsertByScore(model.ScoreBoard).ToList();
+           
+            var scores = _scoreService.InsertOrderedScores(model.ScoreBoard,players,match.MatchId);
+
+            match.ScoreBoard = scores;
+
+            _matchRepository.Update(match);
+
+            return true;
+        }
+
+        public Match GetMatchByTimeStampOnServer(string endPoint, DateTime time)
+        {
+            var match = _matchRepository.GetMatchByTimeStampOnServer(endPoint, time);
+            if (match == null)
+                return null;
+
+            var idsAsBsonArray = match.ScoreBoard.Select(sc => new BsonValue(sc.ScoreId));
+
+            match.ScoreBoard = _scoresRepository.
+                GetScoreBoardByIds(idsAsBsonArray)
+                .ToList();
+            return match;
         }
     }
 }

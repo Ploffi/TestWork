@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using WebApi.Data;
+using WebApi.Repository;
+
+namespace WebApi.Models
+{
+    public class MatchModel
+    {
+        public int MatchId { get; set; }
+        public int TimeLimit { get; set; }
+        public int FragLimit { get; set; }
+        public double TimeElapsed { get; set; }
+        public string Map { get; set; }
+        public DateTime Date { get; set; }    
+        public ScoreModel[] ScoreBoard { get; set; }
+        public string GameMode { get; set; }
+        public string ServerEndPoint { get; set; }
+        public Server Server { get; set; }
+
+        public MatchModel()
+        {
+            
+        }
+        public MatchModel(string map,string gameMode,int fragLimit,int timeLimit,double timeElapsed,ScoreModel[] scoreboard)
+        {
+            Map = map;
+            FragLimit = fragLimit;
+            TimeLimit = timeLimit;
+            TimeElapsed = timeElapsed;
+            ScoreBoard = scoreboard;
+            GameMode = gameMode;
+        }
+    }
+}

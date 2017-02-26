@@ -3,24 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LiteDB;
 
-namespace WebApi.Data
+namespace WebApi.Models
 {
-    public class Score
+    public class ScoreModel
     {
         public int ScoreId { get; set; }
-
-        [BsonRef("players")]
-        [BsonIndex(true)]
-        public Player Player { get; set; }
+        public string Name { get; set; }
         public int Frags { get; set; }
         public int Kills { get; set; }
         public int Deaths { get; set; }
-        public int MatchId { get; set; }
         public int Position { get; set; }
-
-        [BsonIgnore]
-        public Match Match { get; set; }
     }
 }

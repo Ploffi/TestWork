@@ -7,15 +7,10 @@ using LiteDB;
 
 namespace WebApi.Data
 {
-    public class GameMode
+    public class Map
     {
-        public int GameModeId { get; set; }
+        public int MapId { get; set; }
         [BsonIndex(true)]
         public string Name { get; set; }
-
-        public GameMode()
-        {
-            
-        }
     }
 }
