@@ -96,6 +96,7 @@
     <Compile Include="JsonConvertors\RecentMatchesConvertor.cs" />
     <Compile Include="JsonConvertors\ScoreConverter.cs" />
     <Compile Include="JsonConvertors\ServerConverter.cs" />
+    <Compile Include="Models\PlayersInfo.cs" />
     <Compile Include="Models\RecentMatches.cs" />
     <Compile Include="Repository\MatchRepository.cs" />
     <Compile Include="Controllers\ServerController.cs" />

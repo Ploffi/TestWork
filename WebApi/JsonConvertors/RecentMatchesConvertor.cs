@@ -26,7 +26,7 @@ namespace WebApi.JsonConvertors
                 writer.WriteStartObject();
 
                 writer.WriteProperty("server",match.Server.EndPoint);
-                writer.WriteProperty("timestamp",match.Date.ToString(CultureInfo.InvariantCulture));
+                writer.WriteProperty("timestamp",match.Date.ToIsoFormat());
 
                 writer.WritePropertyName("results");
                 serializer.Serialize(writer,match);

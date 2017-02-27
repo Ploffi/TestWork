@@ -31,6 +31,7 @@ namespace WebApi.Services
         {    
             Func<ScoreModel,Player> creator = score => new Player()
             {
+                Name = score.Name,
                 TotalKills = score.Kills,
                 TotalDeaths = score.Deaths,
                 KillsToDeathRatio = (double)score.Kills / Math.Max(1,score.Deaths)
@@ -87,18 +88,22 @@ namespace WebApi.Services
                 lastMatchDate = lastMatchDate.Max(currentMatch.Date);
             }
 
-
-            var totalMatchesPlayed = allPlayerMatchesDict.Count;
-            var favoriteServer = serverDict.KeyOfMaxValue(int.MinValue);
-            var uniqueServers = serverDict.Count;
-            var favoriteGameMode = gameModeDict.KeyOfMaxValue(int.MinValue);
-            var averageScoreBoardPercent = scoreBoard*100/allScores.Count;
             var sumAndMax = dayDict.SumAndMax();
-            var maxMatchesPerDay = sumAndMax.Item2;
-            var averageMatchesPerDay = sumAndMax.Item1/dayDict.Count;
-            var ktd = player.KillsToDeathRatio;
 
-            return null;
+            return new
+            {
+                totalMatchesPlayed = allPlayerMatchesDict.Count,
+                totalMatchesWon = totalMatchesWon,
+                favoriteServer = serverDict.KeyOfMaxValue(int.MinValue),
+                uniqueServers = serverDict.Count,
+                favoriteGameMode = gameModeDict.KeyOfMaxValue(int.MinValue),
+                averageScoreboardPercent = scoreBoard * 100 / allScores.Count,
+                maximumMatchesPerDay = sumAndMax.Item2,
+                averageMatchesPerDay = (double)sumAndMax.Item1 / dayDict.Count,
+                lastMatchPlayed = lastMatchDate.ToIsoFormat(),
+                killToDeathRatio = player.KillsToDeathRatio
+
+            };
         }
     }
 }

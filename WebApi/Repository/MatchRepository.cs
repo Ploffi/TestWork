@@ -11,19 +11,19 @@ namespace WebApi.Repository
     {
         public void Insert(Match match)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.DbPath))
             {
-                var collection = db.GetCollection<Match>(Config.MatchCol);
-                collection.Insert(match);
+                db.GetCollection<Match>(Config.MatchCol)
+                    .Insert(match);
             }
         }
 
         public void Update(Match match)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.DbPath))
             {
-                var collection = db.GetCollection<Match>(Config.MatchCol);
-                collection.Update(match);
+                db.GetCollection<Match>(Config.MatchCol)
+                    .Update(match);
             }
         }
 
@@ -63,11 +63,12 @@ namespace WebApi.Repository
             using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Match>(Config.MatchCol)
+                    .Include(m => m.ScoreBoard)
                     .Include(m => m.Map)
                     .Include(m => m.GameMode)
-                    .Include(m => m.ScoreBoard)
                     .Include(m => m.Server)
-                    .Find(Query.LTE("Date",maxValue),0,count);
+                    .Find(Query.LTE("Date",maxValue),0,count)
+                    ;
             }
         }
 
@@ -78,7 +79,6 @@ namespace WebApi.Repository
                 return db.GetCollection<Match>(Config.MatchCol)
                     .Include(m => m.Map)
                     .Include(m => m.GameMode)
-                    .Include(m => m.ScoreBoard)
                     .Include(m => m.Server)
                     .Find(Query.In("_id", ids));
             }

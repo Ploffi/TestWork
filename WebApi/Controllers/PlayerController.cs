@@ -25,7 +25,8 @@ namespace WebApi.Controllers
         public IHttpActionResult GetPlayerStats(string name)
         {
             name = HttpUtility.UrlDecode(name);
-            return Ok();
+            var stats = _playerService.GetPlayerStats(name);
+            return Ok(stats);
         }
     }
 }

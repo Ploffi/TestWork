@@ -30,7 +30,7 @@ namespace WebApi.Controllers
             
         }
 
-        [Route("recent-matches/")]
+        [Route("recent-matches/{count?}")]
         [HttpGet]
         public IHttpActionResult GetRecentMatches(int count = 5)
         {
@@ -39,7 +39,9 @@ namespace WebApi.Controllers
             if (count <= 0)
                 return Ok(JsonConvert.SerializeObject(new object[0]));
 
-            var matches = _matchRepository.GetRecentMatches(DateTime.MaxValue,count).ToList();
+            var matches = _matchRepository.GetRecentMatches(DateTime.MaxValue,count)
+                .OrderByDescending(match => match.Date)
+                .ToList();
             var scores = matches.SelectMany(m => m.ScoreBoard).ToList();
             var playersDict = _playerRepository
                 .GetByIds(scores
@@ -52,8 +54,14 @@ namespace WebApi.Controllers
             }
 
             return Ok(matches);
-
         }
+
+        [Route("reports/best-players/{count?}")]
+        public IHttpActionResult GetBestPlayers(int count = 5)
+        {
+            return Ok();
+        }
+
     }
 
     public class ReportsConfig : Attribute, IControllerConfiguration
