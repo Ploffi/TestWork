@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Http.Results;
 using LiteDB;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+    [ServerConfig]
     [RoutePrefix("api/servers")]
     public class ServerController : ApiController
     {
@@ -76,9 +78,8 @@ namespace WebApi.Controllers
             var server = _serverRepository.GetByEndPointWithInclude(endPoint);
             if (server == null)
                 return NotFound();
-            return Ok(
-                JsonConvert.SerializeObject(server, Formatting.Indented, new ServerConvertor(true))
-                );
+           
+            return Ok(server);
         }
 
         [Route("info")]
@@ -86,23 +87,24 @@ namespace WebApi.Controllers
         public IHttpActionResult GetServersInfo()
         {
             var servers = _serverRepository.GetAllWithInclude().ToList();
-            return Ok(
-                JsonConvert.SerializeObject(servers,Formatting.Indented,new ServerConvertor(false))
-                );
+            return Ok(servers);
         }
 
         [Route("{endPoint}/matches/{timestamp}")]
         [HttpGet]
         public IHttpActionResult GetMatchInfo(string endPoint,string timestamp)
         {
-            var time = DateTime.Parse(timestamp);
+            DateTime time;
+            if (!DateTime.TryParse(timestamp,out time))
+                return BadRequest();
+            
             var match = _matchService.GetMatchByTimeStampOnServer(endPoint, time);
             
             if (match == null)
                 return NotFound();
 
             return Ok(
-                    JsonConvert.SerializeObject(match, Formatting.Indented, new MatchConvertor(), new ScoreConverter())
+                    match
                     );
         }
 
@@ -145,6 +147,20 @@ namespace WebApi.Controllers
         }
 
     }
+    public class ServerConfig : Attribute, IControllerConfiguration
+    {
+        public void Initialize(HttpControllerSettings controllerSettings,
+                               HttpControllerDescriptor controllerDescriptor)
+        {
+            var converters = controllerSettings.Formatters.JsonFormatter.SerializerSettings.Converters;
+            converters.Add(new ServerListConvertor());
+            converters.Add(new ServerConvertor());
+            converters.Add(new MatchConvertor());
+            converters.Add(new ScoreConverter());
+
+        }
+    }
+
 
     #region test
     class test

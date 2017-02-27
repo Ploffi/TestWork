@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebApi.Data;
+using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-    class ScoreConverter : Convertor
+    public class ScoreConverter : Convertor
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

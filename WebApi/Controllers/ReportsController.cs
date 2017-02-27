@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using LiteDB;
 using Newtonsoft.Json;
 using WebApi.JsonConvertors;
@@ -12,8 +13,9 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+    [ReportsConfig]
     [RoutePrefix("api/reports")]
-    class ReportsController: ApiController
+    public class ReportsController: ApiController
     {
         private MatchRepository _matchRepository;
         private ScoreRepository _scoreRepository;
@@ -23,26 +25,47 @@ namespace WebApi.Controllers
         {
             _scoreRepository= new ScoreRepository();
             _matchRepository = new MatchRepository();
+            _playerRepository = new PlayerRepository();
+            
+            
         }
 
-        [Route("recent-matches/{count}")]
+        [Route("recent-matches/")]
         [HttpGet]
         public IHttpActionResult GetRecentMatches(int count = 5)
         {
+
             count = Math.Min(count, 50);
             if (count <= 0)
                 return Ok(JsonConvert.SerializeObject(new object[0]));
 
             var matches = _matchRepository.GetRecentMatches(DateTime.MaxValue,count).ToList();
             var scores = matches.SelectMany(m => m.ScoreBoard).ToList();
-            var players = _playerRepository.GetByIds(scores.Select(sc =>  new BsonValue(sc.Player.PlayerId))).ToList();
+            var playersDict = _playerRepository
+                .GetByIds(scores
+                    .Select(sc =>  new BsonValue(sc.Player.PlayerId)))
+                .ToDictionary(player => player.PlayerId, player => player);
 
-            for (var scIdx = 0;scIdx<scores.Count;scIdx++)
+            foreach (var score in scores)
             {
-                scores[scIdx].Player = players[scIdx];
+                score.Player = playersDict[score.Player.PlayerId];
             }
 
-            return Ok(JsonConvert.SerializeObject(matches,Formatting.None,new MatchConvertor(),new ScoreConverter()));
+            return Ok(matches);
+
+        }
+    }
+
+    public class ReportsConfig : Attribute, IControllerConfiguration
+    {
+        public void Initialize(HttpControllerSettings controllerSettings,
+                               HttpControllerDescriptor controllerDescriptor)
+        {
+            var converters = controllerSettings.Formatters.JsonFormatter.SerializerSettings.Converters;
+            converters.Add(new RecentMatchesConvertor());
+            converters.Add(new MatchConvertor());
+            converters.Add(new ScoreConverter());
+
         }
     }
 }

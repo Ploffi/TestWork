@@ -68,6 +68,7 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
@@ -85,13 +86,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="JsonConvertors\ServerListConvertor.cs" />
     <Compile Include="Data\Map.cs" />
     <Compile Include="Data\MatchPlayerContractcs.cs" />
     <Compile Include="JsonConvertors\Convertor.cs" />
     <Compile Include="JsonConvertors\MatchConvertor.cs" />
+    <Compile Include="JsonConvertors\RecentMatchesConvertor.cs" />
     <Compile Include="JsonConvertors\ScoreConverter.cs" />
     <Compile Include="JsonConvertors\ServerConverter.cs" />
+    <Compile Include="Models\RecentMatches.cs" />
     <Compile Include="Repository\MatchRepository.cs" />
     <Compile Include="Controllers\ServerController.cs" />
     <Compile Include="Data\Match.cs" />
@@ -108,6 +113,7 @@
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\ScoreRepository.cs" />
     <Compile Include="Repository\ServerRepository.cs" />
+    <Compile Include="Services\Extensions.cs" />
     <Compile Include="Services\GameModeService.cs" />
     <Compile Include="Repository\MapRepository.cs" />
     <Compile Include="Services\MapService.cs" />

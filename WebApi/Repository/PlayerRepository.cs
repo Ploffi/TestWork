@@ -9,7 +9,7 @@ using WebApi.Repository;
 
 namespace WebApi.Services
 {
-    internal class PlayerRepository:Repository<Player>
+    public class PlayerRepository:Repository<Player>
     {
         public PlayerRepository()
         {
@@ -28,10 +28,28 @@ namespace WebApi.Services
             Func<ScoreModel, Player> creator , Action<ScoreModel,Player> updater,bool withoutJournal = false)
         {
             var config = withoutJournal ? Config.JournalOff : Config.DbPath;
-            Func<ScoreModel,Query> queryCreator = sc => Query.EQ("Name",sc.Name);
+            List<Player> playerList;
 
-            return GetOrInsertByTCreator<ScoreModel>(scores,creator,updater,queryCreator,
-                Config.PlayersCol,config);
+            using (var db = new LiteDatabase(config))
+            {
+                var playersCollection = db.GetCollection<Player>(Config.PlayersCol);
+                playerList = scores.Select(score =>
+                {
+                    var exist = playersCollection.FindOne(Query.EQ("Name", score.Name));
+                    if (exist == null)
+                    {
+                        exist = creator(score);
+                        playersCollection.Insert(exist);
+                    }
+                    else
+                    {
+                        updater(score, exist);
+                        playersCollection.Update(exist);
+                    }
+                    return exist;
+                }).ToList();
+            }
+            return playerList;
         }
 
         public IEnumerable<Player> GetByIds(IEnumerable<BsonValue> ids)

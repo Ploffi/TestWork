@@ -24,16 +24,17 @@ namespace WebApi.Services
 
         public void UpsertServer(ServerModel model)
         {
-            var creator = 
-            var gameModes = _gameModeRepository.GetOrInsertByName(model.GameModes);
+            Func<string,GameMode> creator = str => new GameMode() { Name = str};
+            var gameModes = _gameModeRepository.GetOrInsertByName(model.GameModes,creator,true);
+
             var server = new Server()
             {
                 GameModes = gameModes,
                 EndPoint = model.EndPoint,
                 Name = model.Name
             };
-            _serverRepository.Upsert(server);
 
+            _serverRepository.Upsert(server);
         }
 
 
@@ -42,7 +43,6 @@ namespace WebApi.Services
             var matches = _matchRepository.GetAllMatchesOnServerId(server.ServerId).ToList();
 
             var matchPerDayRate = new Dictionary<int,int>();
-            Func<DateTime, int> uniqeKey = date => date.DayOfYear + date.Year*1000;
             var gameModeRate = new Dictionary<string, int>();
             var mapsRate = new Dictionary<string, int>();
             var sumPopulation = 0;
@@ -50,22 +50,23 @@ namespace WebApi.Services
 
             foreach( var match in matches)
             {
-                var key = uniqeKey(match.Date);
-                Increase(matchPerDayRate,key);
+                var key = match.Date.GetUniqeKey();
+                matchPerDayRate.Increment(key);
 
                 var gameModeName = match.GameMode.Name;
-                Increase(gameModeRate, gameModeName);
+                gameModeRate.Increment(gameModeName);
 
                 var mapName = match.Map.Name;
-                Increase(mapsRate, mapName);
+                mapsRate.Increment(mapName);
 
                 sumPopulation += match.ScoreBoard.Count;
                 maxPopulation = Math.Max(maxPopulation,match.ScoreBoard.Count);
               
             }
 
-            var maxMatch = matchPerDayRate.Values.Max();
-            var average = matchPerDayRate.Values.Sum()/matchPerDayRate.Count;
+            var sumAndMax = matchPerDayRate.SumAndMax();
+            var maxMatch = sumAndMax.Item2;
+            var average = sumAndMax.Item1/matchPerDayRate.Count;
 
             var averagePopulation = sumPopulation/ matches.Count;
 
@@ -80,13 +81,9 @@ namespace WebApi.Services
             return null;
         }
 
-        private void Increase<T>(Dictionary<T, int> dict, T key)
-        {
-            if (dict.ContainsKey(key))
-                dict[key]++;
-            else
-                dict.Add(key,1);
-        }
+       
 
     }
+
+  
 }

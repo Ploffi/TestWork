@@ -3,10 +3,11 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using WebApi.Data;
+using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-    class MatchConvertor : Convertor
+    public class MatchConvertor : Convertor
     {
 
         public MatchConvertor()

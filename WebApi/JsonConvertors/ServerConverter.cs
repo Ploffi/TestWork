@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebApi.Controllers;
 using WebApi.Data;
+using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-    class ServerConvertor : Convertor
+    public class ServerConvertor : Convertor
     {
         private bool onlyServerInfo;
 
@@ -24,38 +25,17 @@ namespace WebApi.JsonConvertors
             if (server == null)
                 return;
             writer.WriteStartObject();
+            writer.WriteProperty("name", server.Name);
 
-            if (onlyServerInfo)
-            {
-                WriteServerInfo(writer,serializer,server);
-                writer.WriteEndObject();
-                return;
-            }
-
-            writer. WriteProperty("endPoint", server.EndPoint);
-
-            writer.WritePropertyName("info");
-            writer.WriteStartObject();
-
-            WriteServerInfo(writer, serializer, server);
-
-            writer.WriteEndObject();
-
-            writer.WriteEndObject();
-
-
-        }
-
-        private void WriteServerInfo(JsonWriter writer, JsonSerializer serializer, Server server)
-        {
-            writer. WriteProperty("name", server.Name);
             writer.WritePropertyName("gameModes");
             writer.WriteStartArray();
             foreach (var mode in server.GameModes)
             {
-                serializer.Serialize(writer, mode.Name);
+                writer.WriteValue(mode.Name);
             }
             writer.WriteEndArray();
+
+            writer.WriteEndObject();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

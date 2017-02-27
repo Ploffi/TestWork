@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using WebApi.Data;
 
-namespace WebApi.JsonConvertors
+namespace WebApi.Models
 {
-    public abstract class Convertor : JsonConverter
+    class RecentMatches
     {
 
-    }
+        public List<Match> Matches { get; set; }
 
- 
+    }
 }

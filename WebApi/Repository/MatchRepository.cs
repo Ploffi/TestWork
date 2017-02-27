@@ -39,7 +39,7 @@ namespace WebApi.Repository
                     .Include(m => m.Map)
                     .FindOne(Query.EQ("Date", timeStamp));           
 
-                return serverId == match.Server.ServerId
+                return match != null && serverId == match.Server.ServerId
                     ? match
                     : null;
             }
@@ -67,7 +67,20 @@ namespace WebApi.Repository
                     .Include(m => m.GameMode)
                     .Include(m => m.ScoreBoard)
                     .Include(m => m.Server)
-                    .Find(Query.LTE("Date",maxValue), count);
+                    .Find(Query.LTE("Date",maxValue),0,count);
+            }
+        }
+
+        public IEnumerable<Match> GetAllMatchesByIds(IEnumerable<BsonValue> ids)
+        {
+            using (var db = new LiteDatabase(Config.JournalOff))
+            {
+                return db.GetCollection<Match>(Config.MatchCol)
+                    .Include(m => m.Map)
+                    .Include(m => m.GameMode)
+                    .Include(m => m.ScoreBoard)
+                    .Include(m => m.Server)
+                    .Find(Query.In("_id", ids));
             }
         }
     }
