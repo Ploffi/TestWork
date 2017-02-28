@@ -18,7 +18,6 @@ namespace WebApi.Services
         private ScoreRepository _scoresRepository;
         private PlayerService _playerService;
         private MapService _mapService;
-        private MatchPlayerContractService _MPContractService;
         private ScoreService _scoreService { get; set; }
         private MatchRepository _matchRepository { get; set; }
         private PlayerService _playerModeService { get; set; }
@@ -32,7 +31,6 @@ namespace WebApi.Services
             _scoresRepository = new ScoreRepository();
             _playerService = new PlayerService();
             _mapService = new MapService();
-            _MPContractService = new MatchPlayerContractService();
         }
 
         

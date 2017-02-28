@@ -23,7 +23,6 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
-    [ServerConfig]
     [RoutePrefix("api/servers")]
     public class ServerController : ApiController
     {
@@ -103,9 +102,7 @@ namespace WebApi.Controllers
             if (match == null)
                 return NotFound();
 
-            return Ok(
-                    match
-                    );
+            return Ok( match );
         }
 
         [Route("test/{count}")]
@@ -132,33 +129,10 @@ namespace WebApi.Controllers
             var stats = _serverService.GetServerStats(server);
             var top5 = new [] {new GameMode() {Name = "second"}, new GameMode() {Name = "second"}};
             return Ok(
-               Json(new
-               {
-                   totalMatchesPlayed = 1,
-                   maximumMatchesPerDay = 1,
-                   averageMatchesPerDay = 3,
-                   maximumPopulation = 32,
-                   averagePopulation = 20.5,
-                   top5GameModes = top5,
-                   top5Maps = top5
-                       
-               })
+              stats
                 );
         }
 
-    }
-    public class ServerConfig : Attribute, IControllerConfiguration
-    {
-        public void Initialize(HttpControllerSettings controllerSettings,
-                               HttpControllerDescriptor controllerDescriptor)
-        {
-            var converters = controllerSettings.Formatters.JsonFormatter.SerializerSettings.Converters;
-            converters.Add(new ServerListConvertor());
-            converters.Add(new ServerConvertor());
-            converters.Add(new MatchConvertor());
-            converters.Add(new ScoreConverter());
-
-        }
     }
 
 

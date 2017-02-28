@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LiteDB;
@@ -58,7 +59,7 @@ namespace WebApi.Repository
         }
 
 
-        public IEnumerable<Match> GetRecentMatches(DateTime maxValue, int count)
+        public IEnumerable<Match> GetRecentMatches(int count)
         {
             using (var db = new LiteDatabase(Config.JournalOff))
             {
@@ -67,7 +68,7 @@ namespace WebApi.Repository
                     .Include(m => m.Map)
                     .Include(m => m.GameMode)
                     .Include(m => m.Server)
-                    .Find(Query.LTE("Date",maxValue),0,count)
+                    .Find(Query.All("Date",Query.Descending),0,count)
                     ;
             }
         }
@@ -81,6 +82,15 @@ namespace WebApi.Repository
                     .Include(m => m.GameMode)
                     .Include(m => m.Server)
                     .Find(Query.In("_id", ids));
+            }
+        }
+
+        public IEnumerable<Match> GetAll()
+        {
+            using (var db = new LiteDatabase(Config.JournalOff))
+            {
+                return db.GetCollection<Match>(Config.MatchCol)
+                    .FindAll();
             }
         }
     }

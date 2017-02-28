@@ -10,12 +10,10 @@ namespace WebApi.Repository
 {
     public class GameModeRepository: Repository<GameMode>
     {
-        public List<GameMode> GetOrInsertByName(IEnumerable<string> names, Func<string, GameMode> creator,
-            bool withoutJournal)
+        public List<GameMode> GetOrInsertByName(IEnumerable<string> names, Func<string, GameMode> creator)
         {
-            var config = withoutJournal ? Config.JournalOff : Config.DbPath;
             List<GameMode> modesList;
-            using (var db = new LiteDatabase(config))
+            using (var db = new LiteDatabase(Config.DbPath))
             {
                 var modesCollection = db.GetCollection<GameMode>(Config.GameModesCol);
                 modesList = names.Select(name =>

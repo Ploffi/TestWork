@@ -38,7 +38,7 @@ namespace WebApi.Services
                     
                 };
             }).ToList();
-            _scoreRepository.InsertOrderedPosition(scoresWithPosition);
+            _scoreRepository.Insert(scoresWithPosition);
             return scoresWithPosition;
         }
     }

@@ -4,30 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using LiteDB;
-using Newtonsoft.Json;
-using WebApi.JsonConvertors;
 using WebApi.Repository;
 using WebApi.Services;
 
 namespace WebApi.Controllers
 {
-    [ReportsConfig]
     [RoutePrefix("api/reports")]
     public class ReportsController: ApiController
     {
         private MatchRepository _matchRepository;
         private ScoreRepository _scoreRepository;
         private PlayerRepository _playerRepository;
+        private ServerService _serverService;
 
         public ReportsController()
         {
             _scoreRepository= new ScoreRepository();
             _matchRepository = new MatchRepository();
             _playerRepository = new PlayerRepository();
-            
-            
+            _serverService = new ServerService();            
         }
 
         [Route("recent-matches/{count?}")]
@@ -37,10 +33,9 @@ namespace WebApi.Controllers
 
             count = Math.Min(count, 50);
             if (count <= 0)
-                return Ok(JsonConvert.SerializeObject(new object[0]));
+                return Ok(new object[0]);
 
-            var matches = _matchRepository.GetRecentMatches(DateTime.MaxValue,count)
-                .OrderByDescending(match => match.Date)
+            var matches = _matchRepository.GetRecentMatches(count)
                 .ToList();
             var scores = matches.SelectMany(m => m.ScoreBoard).ToList();
             var playersDict = _playerRepository
@@ -56,24 +51,32 @@ namespace WebApi.Controllers
             return Ok(matches);
         }
 
-        [Route("reports/best-players/{count?}")]
+        [Route("best-players/{count?}")]
         public IHttpActionResult GetBestPlayers(int count = 5)
         {
-            return Ok();
+            count = Math.Min(count, 50);
+            if (count <= 0)
+                return Ok(new object[0]);
+
+            var players = _playerRepository.GetBest(count,0,10);
+            return Ok(
+                players.OrderByDescending(player => player.KillsToDeathRatio)
+            );
         }
 
-    }
-
-    public class ReportsConfig : Attribute, IControllerConfiguration
-    {
-        public void Initialize(HttpControllerSettings controllerSettings,
-                               HttpControllerDescriptor controllerDescriptor)
+        [Route("popular-servers/{count?}")]
+        public IHttpActionResult GetPopularPlayers(int count = 5)
         {
-            var converters = controllerSettings.Formatters.JsonFormatter.SerializerSettings.Converters;
-            converters.Add(new RecentMatchesConvertor());
-            converters.Add(new MatchConvertor());
-            converters.Add(new ScoreConverter());
+            count = Math.Min(count, 50);
+            if (count <= 0)
+                return Ok(new object[0]);
 
+            var serversInfo = _serverService.GetPopular(count);
+            return Ok(
+               serversInfo
+            );
         }
+
     }
+
 }

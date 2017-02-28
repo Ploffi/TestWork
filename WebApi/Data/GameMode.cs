@@ -12,10 +12,5 @@ namespace WebApi.Data
         public int GameModeId { get; set; }
         [BsonIndex(true)]
         public string Name { get; set; }
-
-        public GameMode()
-        {
-            
-        }
     }
 }

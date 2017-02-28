@@ -48,9 +48,9 @@ namespace WebApi.Services
 
     public static class DateTimeExtensions
     {
-        public static int GetUniqeKey(this DateTime time) => time.DayOfYear + time.Year * 1000;
-
+      
         public static DateTime Max(this DateTime time1, DateTime time2) => DateTime.Compare(time1, time2) < 0 ? time2 : time1;
+        public static DateTime Min(this DateTime time1, DateTime time2) => DateTime.Compare(time1, time2) > 0 ? time2 : time1;
 
         public static string ToIsoFormat(this DateTime time) => time.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 

@@ -9,13 +9,18 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Results;
 using System.Web.Http.SelfHost;
+using System.Web.Http.Tracing;
 using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WebApi.Controllers;
 using WebApi.Data;
+using WebApi.JsonConvertors;
 using WebApi.Services;
+using WebApi.Utils;
 
 namespace WebApi
 {
@@ -23,9 +28,9 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            var selfHostConfiguraiton = new HttpSelfHostConfiguration("http://localhost:8080");
-
+            var selfHostConfiguraiton = Configure("http://localhost:8080");
             selfHostConfiguraiton.MapHttpAttributeRoutes();
+            
             using (var server = new HttpSelfHostServer(selfHostConfiguraiton))
             {
                 server.OpenAsync().Wait();
@@ -34,26 +39,22 @@ namespace WebApi
             }
         }
 
-        private static void TestHuynu()
+        private static HttpSelfHostConfiguration Configure(string uri)
         {
-            var d = new Dictionary<string, int>();
-            for (var i = 0; i < 100*100*100; i++)
-            {
-                d.Add(i.ToString(),i);
-            }
-            var st = Stopwatch.StartNew();
-            
-            Console.WriteLine(d.SumAndMax());
-            st.Stop();
-            Console.WriteLine(st.ElapsedMilliseconds);
-            st.Reset();
-            st.Start();
+            var config = new HttpSelfHostConfiguration(uri);
+            var convertors = config.Formatters.JsonFormatter.SerializerSettings.Converters;
 
-            Console.WriteLine();
-            st.Stop();
-            Console.WriteLine(st.ElapsedMilliseconds);
-            st.Reset();
+            convertors.Add(new MatchConvertor());
+            convertors.Add(new ScoreConverter());
+            convertors.Add(new ServerConvertor());
+            convertors.Add(new RecentMatchesConvertor());
+            convertors.Add(new PlayerConverter());
+            convertors.Add(new ServerListConvertor());
 
+            config.Services.Replace(typeof(ITraceWriter),new NLogger());
+            return config;
         }
+
+        
     }  
 }

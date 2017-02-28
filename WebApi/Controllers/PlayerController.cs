@@ -5,7 +5,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using System.Text;
 using System.Web.Http;
 
 using WebApi.Services;
@@ -24,6 +23,7 @@ namespace WebApi.Controllers
         [Route("{name}/stats")]
         public IHttpActionResult GetPlayerStats(string name)
         {
+            throw new DivideByZeroException();
             name = HttpUtility.UrlDecode(name);
             var stats = _playerService.GetPlayerStats(name);
             return Ok(stats);

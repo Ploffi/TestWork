@@ -31,7 +31,7 @@ namespace WebApi.Repository
 
         public Server GetByEndPointWithInclude(string endPoint)
         {
-            using (var db = new LiteDatabase(Config.DbPath))
+            using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .Include(x => x.GameModes)
@@ -41,7 +41,7 @@ namespace WebApi.Repository
 
         public Server GetById(int serverId)
         {
-            using (var db = new LiteDatabase(Config.DbPath))
+            using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .FindById(serverId);
@@ -50,7 +50,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Server> GetAllWithInclude()
         {
-            using (var db = new LiteDatabase(Config.DbPath))
+            using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .Include(s => s.GameModes)
@@ -58,6 +58,14 @@ namespace WebApi.Repository
             }
         }
 
-      
+
+        public IEnumerable<Server> GetAll()
+        {
+            using (var db = new LiteDatabase(Config.JournalOff))
+            {
+                return db.GetCollection<Server>(Config.ServersCol)
+                    .FindAll();
+            }
+        }
     }
 }

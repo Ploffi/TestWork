@@ -14,10 +14,14 @@ namespace WebApi.Data
         public string Name { get; set; }
 
         public int TotalKills { get; set; }
+
         public int TotalDeaths { get; set; }
 
         [BsonIndex]
         public double KillsToDeathRatio { get; set; }
+
+        [BsonIndex]
+        public double TotalMatchesPlayed { get; set; }
 
         [BsonIgnore]
         public List<Score> Scores { get; set; }

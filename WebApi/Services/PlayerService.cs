@@ -34,7 +34,8 @@ namespace WebApi.Services
                 Name = score.Name,
                 TotalKills = score.Kills,
                 TotalDeaths = score.Deaths,
-                KillsToDeathRatio = (double)score.Kills / Math.Max(1,score.Deaths)
+                KillsToDeathRatio = (double)score.Kills / Math.Max(1,score.Deaths),
+                TotalMatchesPlayed = 1
             };
 
             Action<ScoreModel, Player> updater = (score, player) =>
@@ -42,14 +43,15 @@ namespace WebApi.Services
                 player.TotalKills += score.Kills;
                 player.TotalDeaths += score.Deaths;
                 player.KillsToDeathRatio = (double) player.TotalKills/Math.Max(1, player.TotalDeaths);
+                player.TotalMatchesPlayed++;
             };
 
 
-            return _playerRepository.GetOrInsertByScoreModel(scores,creator,updater, withoutJournal);
+            return _playerRepository.GetOrInsertByScoreModel(scores,creator,updater);
            
         }
 
-        public object GetPlayerStats(string playerName)
+        public PlayerStats GetPlayerStats(string playerName)
         {
             var player = _playerRepository.GetByName(playerName);
             var allScores = _scoreRepository.GetScoreBoardByPlayerId(player.PlayerId).ToList();
@@ -59,7 +61,7 @@ namespace WebApi.Services
 
             var serverDict = new Dictionary<string,int>();
             var gameModeDict = new Dictionary<string,int>();
-            var dayDict = new Dictionary<int, int>();
+            var dayDict = new Dictionary<DateTime, int>();
 
             var lastMatchDate = DateTime.MinValue;      
             var totalMatchesWon = 0;
@@ -82,7 +84,7 @@ namespace WebApi.Services
                                     ?  1 
                                     : (double)(totalPlayers - score.Position)/(totalPlayers - 1);
 
-                var dayKey = currentMatch.Date.GetUniqeKey();
+                var dayKey = currentMatch.Date.Date;
                 dayDict.Increment(dayKey);
 
                 lastMatchDate = lastMatchDate.Max(currentMatch.Date);
@@ -90,7 +92,7 @@ namespace WebApi.Services
 
             var sumAndMax = dayDict.SumAndMax();
 
-            return new
+            return new PlayerStats()
             {
                 totalMatchesPlayed = allPlayerMatchesDict.Count,
                 totalMatchesWon = totalMatchesWon,

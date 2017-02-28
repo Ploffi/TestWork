@@ -10,7 +10,7 @@ namespace WebApi
 {
     public static class Config
     {
-        static NameValueCollection settings;
+        static readonly NameValueCollection settings;
         static Config()
         {
             settings = ConfigurationManager.AppSettings;
@@ -24,6 +24,5 @@ namespace WebApi
         public static string GameModesCol => settings["GameModesCol"];
         public static string JournalOff => "filename="+DbPath +settings["JournalOff"];
         public static string MapsCol => settings["MapsCol"];
-        public static string MPContract => settings["MPContract"];
     }
 }

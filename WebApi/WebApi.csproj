@@ -58,6 +58,10 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.3\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -88,16 +92,16 @@
     <Compile Include="Config.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="JsonConvertors\PlayerConverter.cs" />
     <Compile Include="JsonConvertors\ServerListConvertor.cs" />
     <Compile Include="Data\Map.cs" />
-    <Compile Include="Data\MatchPlayerContractcs.cs" />
     <Compile Include="JsonConvertors\Convertor.cs" />
     <Compile Include="JsonConvertors\MatchConvertor.cs" />
     <Compile Include="JsonConvertors\RecentMatchesConvertor.cs" />
     <Compile Include="JsonConvertors\ScoreConverter.cs" />
     <Compile Include="JsonConvertors\ServerConverter.cs" />
-    <Compile Include="Models\PlayersInfo.cs" />
-    <Compile Include="Models\RecentMatches.cs" />
+    <Compile Include="Models\PlayerStats.cs" />
+    <Compile Include="Models\ServerStats.cs" />
     <Compile Include="Repository\MatchRepository.cs" />
     <Compile Include="Controllers\ServerController.cs" />
     <Compile Include="Data\Match.cs" />
@@ -118,12 +122,13 @@
     <Compile Include="Services\GameModeService.cs" />
     <Compile Include="Repository\MapRepository.cs" />
     <Compile Include="Services\MapService.cs" />
-    <Compile Include="Services\MatchPlayerContractService.cs" />
     <Compile Include="Services\MatchService.cs" />
     <Compile Include="Repository\PlayerRepository.cs" />
     <Compile Include="Services\PlayerService.cs" />
     <Compile Include="Services\ScoreService.cs" />
+    <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Services\ServerService.cs" />
+    <Compile Include="Utils\NLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -141,7 +146,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

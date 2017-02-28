@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using LiteDB;
 using WebApi.Data;
 using WebApi.Models;
-using WebApi.Repository;
 
-namespace WebApi.Services
+namespace WebApi.Repository
 {
     public class PlayerRepository:Repository<Player>
     {
-        public PlayerRepository()
-        {
-        }
 
         public Player GetByName(string playerName)
         {
-            using (var db = new LiteDatabase(Config.DbPath))
+            using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Player>(Config.PlayersCol)
                     .FindOne(Query.EQ("Name", playerName));
@@ -25,12 +20,11 @@ namespace WebApi.Services
         }
 
         public List<Player> GetOrInsertByScoreModel(IEnumerable<ScoreModel> scores,
-            Func<ScoreModel, Player> creator , Action<ScoreModel,Player> updater,bool withoutJournal = false)
+            Func<ScoreModel, Player> creator , Action<ScoreModel,Player> updater)
         {
-            var config = withoutJournal ? Config.JournalOff : Config.DbPath;
             List<Player> playerList;
 
-            using (var db = new LiteDatabase(config))
+            using (var db = new LiteDatabase(Config.DbPath))
             {
                 var playersCollection = db.GetCollection<Player>(Config.PlayersCol);
                 playerList = scores.Select(score =>
@@ -54,11 +48,25 @@ namespace WebApi.Services
 
         public IEnumerable<Player> GetByIds(IEnumerable<BsonValue> ids)
         {
-            using (var db = new LiteDatabase(Config.DbPath))
+            using (var db = new LiteDatabase(Config.JournalOff))
             {
                 return db.GetCollection<Player>(Config.PlayersCol)
                     .Find(Query.In("_id", ids));
             }
         }
+
+
+        public IEnumerable<Player> GetBest(int count,int minTotalDeaths = 0,int minTotalMatchesPlayed = 10)
+        {
+            using (var db = new LiteDatabase(Config.JournalOff))
+            {
+                return db.GetCollection<Player>(Config.PlayersCol)
+                    .Find(Query.And(
+                        Query.GT("TotalDeaths",minTotalDeaths),
+                        Query.GT("TotalMatchesPlayed",minTotalMatchesPlayed)
+                        ),0,count);
+            }
+        }
+
     }
 }

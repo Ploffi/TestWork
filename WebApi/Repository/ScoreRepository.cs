@@ -11,9 +11,9 @@ namespace WebApi.Repository
 {
     public class ScoreRepository
     {
-        public void InsertOrderedPosition(IEnumerable<Score> scores)
+        public void Insert(IEnumerable<Score> scores)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.DbPath))
             {  
                 db.GetCollection<Score>(Config.ScoreCol)
                     .Insert(scores);
