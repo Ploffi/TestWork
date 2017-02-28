@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using LiteDB;
 using WebApi.Data;
-
 namespace WebApi.Repository
 {
     public class ServerRepository
@@ -31,7 +25,7 @@ namespace WebApi.Repository
 
         public Server GetByEndPointWithInclude(string endPoint)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .Include(x => x.GameModes)
@@ -41,7 +35,7 @@ namespace WebApi.Repository
 
         public Server GetById(int serverId)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .FindById(serverId);
@@ -50,7 +44,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Server> GetAllWithInclude()
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .Include(s => s.GameModes)
@@ -61,7 +55,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Server> GetAll()
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Server>(Config.ServersCol)
                     .FindAll();

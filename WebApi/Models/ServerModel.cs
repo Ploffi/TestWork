@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using WebApi.Data;
-using WebApi.Repository;
-
-namespace WebApi.Models
+﻿namespace WebApi.Models
 {
     public class ServerModel
     {

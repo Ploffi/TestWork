@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebApi.Data;
-using WebApi.Repository;
 
 namespace WebApi.Models
 {
@@ -39,7 +35,7 @@ namespace WebApi.Models
         {
             return string.IsNullOrEmpty(Map) || string.IsNullOrEmpty(GameMode) ||
                    !FragLimit.HasValue || !TimeLimit.HasValue || !TimeElapsed.HasValue
-                   || !Date.HasValue || ScoreBoard.Any(sc => sc.IsNotValid());
+                   || ScoreBoard.Any(sc => sc.IsNotValid());
 
         }
     }

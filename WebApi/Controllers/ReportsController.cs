@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using LiteDB;
 using WebApi.Repository;
@@ -14,13 +11,11 @@ namespace WebApi.Controllers
     public class ReportsController: ApiController
     {
         private MatchRepository _matchRepository;
-        private ScoreRepository _scoreRepository;
         private PlayerRepository _playerRepository;
         private ServerService _serverService;
 
         public ReportsController()
         {
-            _scoreRepository= new ScoreRepository();
             _matchRepository = new MatchRepository();
             _playerRepository = new PlayerRepository();
             _serverService = new ServerService();            
@@ -65,7 +60,7 @@ namespace WebApi.Controllers
         }
 
         [Route("popular-servers/{count?}")]
-        public IHttpActionResult GetPopularPlayers(int count = 5)
+        public IHttpActionResult GetPopularServers(int count = 5)
         {
             count = Math.Min(count, 50);
             if (count <= 0)

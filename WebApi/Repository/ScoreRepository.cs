@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using LiteDB;
 using WebApi.Data;
-using WebApi.Models;
 
 namespace WebApi.Repository
 {
@@ -22,7 +17,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Score> GetScoreBoardByIds(IEnumerable<BsonValue> scoreBoard)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Score>(Config.ScoreCol)
                     .Include(x => x.Player)
@@ -32,7 +27,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Score> GetScoreBoardByPlayerId(int playerId)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Score>(Config.ScoreCol)
                     .Include(x => x.Player)

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WebApi
 {
@@ -22,7 +17,11 @@ namespace WebApi
         public static string ScoreCol => settings["ScoreCol"];
         public static string MatchCol => settings["MatchCol"];
         public static string GameModesCol => settings["GameModesCol"];
-        public static string JournalOff => "filename="+DbPath +settings["JournalOff"];
+        public static string JournalOff => DbPath +settings["JournalOff"];
         public static string MapsCol => settings["MapsCol"];
+        public static string ReadOnlyMode => JournalOff+settings["ReadOnlyMode"];
+        public static string UtilsDb => settings["UtilsDb"];
+        public static string UtilsCol => settings["UtilsCol"];
+        public static string UtilsDbReadOnly => "filename=" + settings["UtilsDb"] + settings["ReadOnlyMode"];
     }
 }

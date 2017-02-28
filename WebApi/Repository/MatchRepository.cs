@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using LiteDB;
 using WebApi.Data;
-using WebApi.Models;
 
 namespace WebApi.Repository
 {
@@ -30,17 +27,19 @@ namespace WebApi.Repository
 
         public Match GetMatchByTimeStampOnServer(string endPoint, DateTime timeStamp)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
-                var serverId = db.GetCollection<Server>(Config.ServersCol)
-                    .FindOne(Query.EQ("EndPoint", endPoint)).ServerId;
+                var server = db.GetCollection<Server>(Config.ServersCol)
+                    .FindOne(Query.EQ("EndPoint", endPoint));
+                if (server == null)
+                    return null;
 
                 var match = db.GetCollection<Match>(Config.MatchCol)
                     .Include(m => m.GameMode)
                     .Include(m => m.Map)
                     .FindOne(Query.EQ("Date", timeStamp));           
 
-                return match != null && serverId == match.Server.ServerId
+                return match != null && server.ServerId == match.Server.ServerId
                     ? match
                     : null;
             }
@@ -48,7 +47,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Match> GetAllMatchesOnServerId(int serverId)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Match>(Config.MatchCol)
                     .Include(m => m.GameMode)
@@ -61,7 +60,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Match> GetRecentMatches(int count)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Match>(Config.MatchCol)
                     .Include(m => m.ScoreBoard)
@@ -75,7 +74,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Match> GetAllMatchesByIds(IEnumerable<BsonValue> ids)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Match>(Config.MatchCol)
                     .Include(m => m.Map)
@@ -87,7 +86,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Match> GetAll()
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Match>(Config.MatchCol)
                     .FindAll();

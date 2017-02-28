@@ -1,25 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.ExceptionHandling;
-using System.Web.Http.Results;
 using System.Web.Http.SelfHost;
 using System.Web.Http.Tracing;
-using LiteDB;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using WebApi.Controllers;
-using WebApi.Data;
 using WebApi.JsonConvertors;
-using WebApi.Services;
 using WebApi.Utils;
 
 namespace WebApi
@@ -28,14 +12,17 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            var selfHostConfiguraiton = Configure("http://localhost:8080");
+            var uriData = args.Skip(1).First().Split('+');           
+            var prefix = uriData.First();
+            var port = uriData.Last();
+
+            var selfHostConfiguraiton = Configure(prefix+"localhost"+port);
             selfHostConfiguraiton.MapHttpAttributeRoutes();
             
             using (var server = new HttpSelfHostServer(selfHostConfiguraiton))
             {
                 server.OpenAsync().Wait();
-                Console.WriteLine("ready");
-                Console.ReadLine();
+                Console.ReadKey(true);
             }
         }
 

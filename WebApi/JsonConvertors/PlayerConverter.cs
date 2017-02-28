@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebApi.Data;
 using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-    public class PlayerConverter:Convertor
+    public class PlayerConverter:JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using Newtonsoft.Json;
 using WebApi.Data;
 using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-    public class MatchConvertor : Convertor
+    public class MatchConvertor: JsonConverter
     {
-
-        public MatchConvertor()
-        {
-            
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        
+           public override void  WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var match = value as Match;
             if (match == null)
@@ -47,7 +41,7 @@ namespace WebApi.JsonConvertors
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace WebApi.Repository
 
         public Player GetByName(string playerName)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Player>(Config.PlayersCol)
                     .FindOne(Query.EQ("Name", playerName));
@@ -27,28 +27,32 @@ namespace WebApi.Repository
             using (var db = new LiteDatabase(Config.DbPath))
             {
                 var playersCollection = db.GetCollection<Player>(Config.PlayersCol);
-                playerList = scores.Select(score =>
+                using (var trans = db.BeginTrans())
                 {
-                    var exist = playersCollection.FindOne(Query.EQ("Name", score.Name));
-                    if (exist == null)
+                    playerList = scores.Select(score =>
                     {
-                        exist = creator(score);
-                        playersCollection.Insert(exist);
-                    }
-                    else
-                    {
-                        updater(score, exist);
-                        playersCollection.Update(exist);
-                    }
-                    return exist;
-                }).ToList();
+                        var exist = playersCollection.FindOne(Query.EQ("Name", score.Name.ToLowerInvariant()));
+                        if (exist == null)
+                        {
+                            exist = creator(score);
+                            playersCollection.Insert(exist);
+                        }
+                        else
+                        {
+                            updater(score, exist);
+                            playersCollection.Update(exist);
+                        }
+                        return exist;
+                    }).ToList();
+                    trans.Commit();
+                }                           
             }
             return playerList;
         }
 
         public IEnumerable<Player> GetByIds(IEnumerable<BsonValue> ids)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Player>(Config.PlayersCol)
                     .Find(Query.In("_id", ids));
@@ -58,7 +62,7 @@ namespace WebApi.Repository
 
         public IEnumerable<Player> GetBest(int count,int minTotalDeaths = 0,int minTotalMatchesPlayed = 10)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<Player>(Config.PlayersCol)
                     .Find(Query.And(

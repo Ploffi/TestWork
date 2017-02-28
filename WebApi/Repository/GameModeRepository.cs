@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LiteDB;
 using WebApi.Data;
 
@@ -16,23 +14,29 @@ namespace WebApi.Repository
             using (var db = new LiteDatabase(Config.DbPath))
             {
                 var modesCollection = db.GetCollection<GameMode>(Config.GameModesCol);
-                modesList = names.Select(name =>
+                using (var trans = db.BeginTrans())
                 {
-                    var exist = modesCollection.FindOne(Query.EQ("Name", name));
-                    if (exist == null)
+                    modesList = names.Select(name =>
                     {
-                        exist = creator(name);
-                        modesCollection.Insert(exist);
-                    }
-                    return exist;
-                }).ToList();
+                        var exist = modesCollection.FindOne(Query.EQ("Name", name));
+                        if (exist == null)
+                        {
+                            exist = creator(name);
+                            modesCollection.Insert(exist);
+                        }
+                        return exist;
+                    }).ToList();
+
+                    trans.Commit();
+                }
+               
             }
             return modesList;
         }
 
         public GameMode GetByName(string gameModeName)
         {
-            using (var db = new LiteDatabase(Config.JournalOff))
+            using (var db = new LiteDatabase(Config.ReadOnlyMode))
             {
                 return db.GetCollection<GameMode>(Config.GameModesCol)
                     .FindOne(Query.EQ("Name", gameModeName));

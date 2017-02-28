@@ -1,21 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Results;
-using LiteDB;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using WebApi.Data;
-using WebApi.JsonConvertors;
 using WebApi.Models;
 using WebApi.Repository;
 using WebApi.Services;
@@ -29,20 +14,17 @@ namespace WebApi.Controllers
         private MatchService _matchService;
         private ServerService _serverService;
         private ServerRepository _serverRepository;
-        public MatchRepository _matchRepository;
         public ServerController()
         {
             _matchService = new MatchService();
             _serverService = new ServerService();
-            _matchRepository = new MatchRepository();
             _serverRepository = new ServerRepository();
         }
 
         [Route("{endPoint}/info/")]
         [HttpPut]
-        public IHttpActionResult AdvertiseServer(string data, string endPoint)
+        public IHttpActionResult AdvertiseServer(ServerModel model, string endPoint)
         {
-            var model = JsonConvert.DeserializeObject<ServerModel>(data);
             if (model.IsNotValid())
                 return BadRequest();
             model.EndPoint = endPoint;
@@ -52,9 +34,8 @@ namespace WebApi.Controllers
 
         [Route("{endPoint}/matches/{timestamp}")]
         [HttpPut]
-        public IHttpActionResult PutMatches(string data, string endPoint, string timestamp)
+        public IHttpActionResult PutMatches(MatchModel model, string endPoint, string timestamp)
         {
-            var model = JsonConvert.DeserializeObject<MatchModel>(data);
             if (model.IsNotValid())
                 return BadRequest();
             var server = _serverRepository.GetByEndPointWithInclude(endPoint);

@@ -1,18 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebApi.Data;
 using WebApi.Services;
 
 namespace WebApi.JsonConvertors
 {
-   public  class RecentMatchesConvertor : Convertor
+   public  class RecentMatchesConvertor:JsonConverter
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void  WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var matches = value as List<Match>;
             if (matches == null)

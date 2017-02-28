@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using WebApi.Data;
 using WebApi.Services;
 
-namespace WebApi.Controllers
+namespace WebApi.JsonConvertors
 {
     internal class ServerListConvertor : JsonConverter
     {
@@ -17,15 +17,14 @@ namespace WebApi.Controllers
             foreach (var server in servers)
             {
                 writer.WriteStartObject();
-                writer.WriteProperty("endPoint", server.EndPoint);
+                writer.WriteProperty("endpoint", server.EndPoint);
 
                 writer.WritePropertyName("info");
                 serializer.Serialize(writer,server);
 
                 writer.WriteEndObject();
-
-            }
-         
+            }  
+                  
             writer.WriteEndArray();
         }
 

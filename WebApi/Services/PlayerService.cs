@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using LiteDB;
 using WebApi.Data;
@@ -31,17 +30,17 @@ namespace WebApi.Services
         {    
             Func<ScoreModel,Player> creator = score => new Player()
             {
-                Name = score.Name,
-                TotalKills = score.Kills,
-                TotalDeaths = score.Deaths,
-                KillsToDeathRatio = (double)score.Kills / Math.Max(1,score.Deaths),
+                Name = score.Name.ToLowerInvariant(),
+                TotalKills = score.Kills.Value,
+                TotalDeaths = score.Deaths.Value,
+                KillsToDeathRatio = (double)score.Kills / Math.Max(1,score.Deaths.Value),
                 TotalMatchesPlayed = 1
             };
 
             Action<ScoreModel, Player> updater = (score, player) =>
             {
-                player.TotalKills += score.Kills;
-                player.TotalDeaths += score.Deaths;
+                player.TotalKills += score.Kills.Value;
+                player.TotalDeaths += score.Deaths.Value;
                 player.KillsToDeathRatio = (double) player.TotalKills/Math.Max(1, player.TotalDeaths);
                 player.TotalMatchesPlayed++;
             };
@@ -54,6 +53,8 @@ namespace WebApi.Services
         public PlayerStats GetPlayerStats(string playerName)
         {
             var player = _playerRepository.GetByName(playerName);
+            if (player == null)
+                return null;
             var allScores = _scoreRepository.GetScoreBoardByPlayerId(player.PlayerId).ToList();
             var allPlayerMatchesDict = _matchRepository
                 .GetAllMatchesByIds(allScores.Select(score =>  new BsonValue(score.MatchId)))

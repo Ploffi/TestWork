@@ -12,11 +12,14 @@ namespace WebApi.Services
         private ServerRepository _serverRepository;
         private GameModeRepository _gameModeRepository;
         private MatchRepository _matchRepository;
+        private UtilRepository _utilRepository;
+
         public ServerService()
         {
             _serverRepository = new ServerRepository();
             _gameModeRepository = new GameModeRepository();
             _matchRepository = new MatchRepository();
+            _utilRepository = new UtilRepository();
         }
 
         public void UpsertServer(ServerModel model)
@@ -38,11 +41,14 @@ namespace WebApi.Services
         public ServerStats GetServerStats(Server server)
         {
             var matches = _matchRepository.GetAllMatchesOnServerId(server.ServerId).ToList();
+            if (matches.Count == 0)
+                return new ServerStats();
 
             var matchPerDayRate = new Dictionary<DateTime,int>();
 
             var minDate = DateTime.MaxValue;
-            var maxDate = DateTime.MinValue;
+            var maxDate = _utilRepository.GetMaxDate();
+
 
             var gameModeRate = new Dictionary<string, int>();
             var mapsRate = new Dictionary<string, int>();
@@ -55,7 +61,6 @@ namespace WebApi.Services
                 matchPerDayRate.Increment(date);
 
                 minDate = date.Min(minDate);
-                maxDate = date.Max(maxDate);
 
                 var gameModeName = match.GameMode.Name;
                 gameModeRate.Increment(gameModeName);
@@ -69,9 +74,7 @@ namespace WebApi.Services
             }
 
 
-            return matches.Count == 0  
-                ? new ServerStats()
-                : new ServerStats()
+            return new ServerStats()
             {
                 totalMatchesPlayed = matches.Count,
                 maximumMatchesPerDay = matchPerDayRate.Values.Max(),
@@ -92,7 +95,10 @@ namespace WebApi.Services
 
         public IEnumerable<ServerInfo> GetPopular(int count)
         {
-            var matches = _matchRepository.GetAll();
+            var matches = _matchRepository.GetAll().ToList();
+            if (matches == null || !matches.Any())
+                return new ServerInfo[0];
+
             var serversDict = _serverRepository.GetAll()
                 .ToDictionary(server => server.ServerId, server => new ServerInfo()
             {
@@ -101,9 +107,10 @@ namespace WebApi.Services
                 EndPoint = server.EndPoint
             });
             var serverMinDateDict = new Dictionary<int,DateTime>(serversDict.Count); 
-            var serversTotalMatchesDict = new Dictionary<int,int>(serversDict.Count); 
+            var serversTotalMatchesDict = new Dictionary<int,int>(serversDict.Count);
 
-            var maxDate = DateTime.MinValue;
+            var maxDate = _utilRepository.GetMaxDate();
+
             foreach (var match in matches)
             {
                 var serverId = match.ServerId;
