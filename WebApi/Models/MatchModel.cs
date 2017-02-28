@@ -10,12 +10,12 @@ namespace WebApi.Models
 {
     public class MatchModel
     {
-        public int MatchId { get; set; }
-        public int TimeLimit { get; set; }
-        public int FragLimit { get; set; }
-        public double TimeElapsed { get; set; }
+        public int? MatchId { get; set; }
+        public int? TimeLimit { get; set; }
+        public int? FragLimit { get; set; }
+        public double? TimeElapsed { get; set; }
         public string Map { get; set; }
-        public DateTime Date { get; set; }    
+        public DateTime? Date { get; set; }    
         public ScoreModel[] ScoreBoard { get; set; }
         public string GameMode { get; set; }
         public string ServerEndPoint { get; set; }
@@ -33,6 +33,14 @@ namespace WebApi.Models
             TimeElapsed = timeElapsed;
             ScoreBoard = scoreboard;
             GameMode = gameMode;
+        }
+
+        public bool IsNotValid()
+        {
+            return string.IsNullOrEmpty(Map) || string.IsNullOrEmpty(GameMode) ||
+                   !FragLimit.HasValue || !TimeLimit.HasValue || !TimeElapsed.HasValue
+                   || !Date.HasValue || ScoreBoard.Any(sc => sc.IsNotValid());
+
         }
     }
 }

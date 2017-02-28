@@ -17,6 +17,14 @@ namespace WebApi.Models
         {
             Name = name;
             GameModes = gameModes;
-        }    
+        }
+        public ServerModel()
+        {
+        }
+
+        public bool IsNotValid()
+        {
+            return GameModes == null || string.IsNullOrEmpty(Name);
+        }
     }
 }

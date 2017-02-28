@@ -23,9 +23,11 @@ namespace WebApi.Controllers
         [Route("{name}/stats")]
         public IHttpActionResult GetPlayerStats(string name)
         {
-            throw new DivideByZeroException();
+           
             name = HttpUtility.UrlDecode(name);
-            var stats = _playerService.GetPlayerStats(name);
+            if (string.IsNullOrEmpty(name))
+                return BadRequest();
+            var stats = _playerService.GetPlayerStats(name.ToLower());
             return Ok(stats);
         }
     }
